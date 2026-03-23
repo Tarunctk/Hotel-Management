@@ -46,18 +46,19 @@ class BookingUtils {
     //fixed and find available rooms without double booking options
     const roomResult = await pool.query(
       `
-      SELECT r.*
-      FROM room r
-      WHERE r.room_type_id = $1
-      AND r.id NOT IN (
+        SELECT r.*
+        FROM room r
+        WHERE r.room_type_id = $1
+        AND r.id NOT IN (
         SELECT b.room_id
         FROM booking b
-        WHERE NOT (
-          b.check_out_date <= $2
-          OR b.check_in_date >= $3
-        )
-      )
-      LIMIT 1
+        WHERE b.status IN ('INITIALIZED','CONFIRMED','CHECKED_IN','CHECKED_OUT')
+        AND NOT (
+         b.check_out_date <= $2
+         OR b.check_in_date >= $3
+         )
+         )
+       LIMIT 1
       `,
       [roomTypeId, checkIn, checkOut]
     );

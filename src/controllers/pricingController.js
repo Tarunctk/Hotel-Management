@@ -40,12 +40,12 @@ exports.calculatePrice = async (req, res) => {
       const day = currentDate.getDay()
       const month = currentDate.getMonth() + 1
 
-      //WEEKEND
-      if (day === 5 || day === 6) {
+      //weekend
+      if (day === 6 || day === 7) {
         applicableStrategies.push("WEEKEND")
       }
 
-      //SEASONAL
+      //seasonal
       if (
         (month === 12 || month === 1) ||
         (month >= 6 && month <= 8)

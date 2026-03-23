@@ -3,7 +3,7 @@ const PricingStrategyFactory = require("../pricing/pricingStrategy");
 
 class BookingUtils {
 
-  // INITIALIZE BOOKING
+  //intializing booking
   static async initializeBooking(guestName, roomTypeValue, checkInDate, checkOutDate) {
 
     function parseDate(dateStr) {
@@ -24,7 +24,7 @@ class BookingUtils {
       throw new Error("Invalid date range");
     }
 
-    // ✅ HANDLE BOTH ID OR NAME
+    //with room type id and name
     let roomTypeId;
 
     if (isNaN(roomTypeValue)) {
@@ -43,7 +43,7 @@ class BookingUtils {
       roomTypeId = roomTypeValue;
     }
 
-    // 🔥 FIXED: FIND AVAILABLE ROOM (NO DOUBLE BOOKING)
+    //fixed and find available rooms without double booking options
     const roomResult = await pool.query(
       `
       SELECT r.*
@@ -68,7 +68,7 @@ class BookingUtils {
 
     const roomId = roomResult.rows[0].id;
 
-    // ✅ GET PRICE
+    //get the price from room type table
     const roomTypeResult = await pool.query(
       "SELECT price FROM room_type WHERE id=$1",
       [roomTypeId]
@@ -76,7 +76,7 @@ class BookingUtils {
 
     const basePrice = parseFloat(roomTypeResult.rows[0].price);
 
-    // ✅ CALCULATE PRICE
+    //calculate the price for each day
     let currentDate = new Date(checkIn);
     const endDate = new Date(checkOut);
     let totalCost = 0;
@@ -100,7 +100,7 @@ class BookingUtils {
       currentDate.setDate(currentDate.getDate() + 1);
     }
 
-    // ✅ INSERT BOOKING
+    //After calculating the price we are going to insert booking(create a booking)
     const result = await pool.query(
       `INSERT INTO booking 
       (guest_name, room_type_id, room_id, check_in_date, check_out_date, total_cost, status)
@@ -113,7 +113,7 @@ class BookingUtils {
   }
 
 
-  // CONFIRM BOOKING
+  //confirm booking
   static async confirmBooking(id) {
 
     const result = await pool.query(
@@ -140,7 +140,7 @@ class BookingUtils {
   }
 
 
-  // CHECK IN
+  //checkin
   static async checkInBooking(id) {
 
     const result = await pool.query(
@@ -167,7 +167,7 @@ class BookingUtils {
   }
 
 
-  // CHECK OUT
+  //checkout
   static async checkOutBooking(id) {
 
     const result = await pool.query(
@@ -194,7 +194,7 @@ class BookingUtils {
   }
 
 
-  // COMPLETE BOOKING
+  //complete the booking
   static async completeBooking(id) {
 
     const result = await pool.query(

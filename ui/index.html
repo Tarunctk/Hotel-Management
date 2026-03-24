@@ -131,19 +131,23 @@
 
 <div class="form-row" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
 
-<input id="guestName" placeholder="Guest Name">
+  <input id="guestName" placeholder="Guest Name">
 
-<select id="bookingRoomTypeId"></select>
+  <select id="bookingRoomTypeId"></select>
 
-<input id="checkInDate" type="date" title="Check-in">
+  <!-- Check-In -->
+  <b><span style="font-size:14px;">Check-In</span></b>
+  <input id="checkInDate" type="date">
 
-<input id="checkOutDate" type="date" title="Check-out">
+  <!-- Check-Out -->
+  <b><span style="font-size:14px;">Check-Out</span></b>
+  <input id="checkOutDate" type="date">
 
-<button onclick="checkBookingPrice()">Check Price</button>
+  <button onclick="checkBookingPrice()">Check Price</button>
 
-<button id="createBookingBtn" onclick="createBooking()" disabled>
-Create Booking
-</button>
+  <button id="createBookingBtn" onclick="createBooking()" disabled>
+    Create Booking
+  </button>
 
 </div>
 

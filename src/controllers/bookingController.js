@@ -5,12 +5,13 @@ const pool = require("../db/db");
 //Create Booking Initialization
 exports.createBooking = async (req,res)=>{
   try{
-    const {guestName, roomTypeId, checkInDate, checkOutDate} = req.body;
+    const {guestName, roomTypeId, checkInDate, checkOutDate,email} = req.body;
     const booking = await BookingUtils.initializeBooking(
       guestName,
       roomTypeId,
       checkInDate,
-      checkOutDate
+      checkOutDate,
+      email
     );
     res.json(booking);
   }catch(err){

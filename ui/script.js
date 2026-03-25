@@ -1,5 +1,5 @@
-const API = "https://hotel-management-e3zu.onrender.com";
-
+//const API = "https://hotel-management-e3zu.onrender.com";
+const API="http://localhost:3000"
 /* ---------------- GLOBAL ---------------- */
 
 let calculatedPrice = null
@@ -475,6 +475,7 @@ async function createBooking(){
   const roomTypeId = document.getElementById("bookingRoomTypeId").value
   const checkIn = document.getElementById("checkInDate").value
   const checkOut = document.getElementById("checkOutDate").value
+  const email = document.getElementById("email").value
 
   try {
 
@@ -485,7 +486,8 @@ async function createBooking(){
         guestName: guestName,
         roomTypeId: Number(roomTypeId),
         checkInDate: checkIn,
-        checkOutDate: checkOut
+        checkOutDate: checkOut,
+        email:email
       })
     })
 

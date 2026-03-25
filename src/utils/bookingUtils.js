@@ -1,10 +1,16 @@
 const pool = require("../db/db");
 const PricingStrategyFactory = require("../pricing/pricingStrategy");
+const sendEmail = require("./email");
+
+const generateBookingCode = (id) => {
+  const year = new Date().getFullYear();
+  return `BK-${year}-${String(id).padStart(5, '0')}`;
+};
 
 class BookingUtils {
 
   //intializing booking
-  static async initializeBooking(guestName, roomTypeValue, checkInDate, checkOutDate) {
+  static async initializeBooking(guestName, roomTypeValue, checkInDate, checkOutDate,email) {
 
     function parseDate(dateStr) {
       if (dateStr.includes("-")) return new Date(dateStr);
@@ -102,15 +108,29 @@ class BookingUtils {
     }
 
     //After calculating the price we are going to insert booking(create a booking)
-    const result = await pool.query(
-      `INSERT INTO booking 
-      (guest_name, room_type_id, room_id, check_in_date, check_out_date, total_cost, status)
-      VALUES ($1,$2,$3,$4,$5,$6,'INITIALIZED')
-      RETURNING *`,
-      [guestName, roomTypeId, roomId, checkIn, checkOut, totalCost]
-    );
+      let bookingCode = "TEMP-" + Date.now();
 
-    return result.rows[0];
+      const result = await pool.query(
+        `INSERT INTO booking 
+         (guest_name, room_type_id, room_id, check_in_date, check_out_date, total_cost, status, booking_code,email)
+         VALUES ($1,$2,$3,$4,$5,$6,'INITIALIZED',$7,$8)
+         RETURNING *`,
+         [guestName, roomTypeId, roomId, checkIn, checkOut, totalCost, bookingCode,email]
+        );
+
+      const bookingId = Number(result.rows[0].id);
+      bookingCode = generateBookingCode(bookingId);
+      const updateResult=await pool.query(
+        "UPDATE booking SET booking_code = $1 WHERE id = $2 returning *",
+        [bookingCode, bookingId]
+        );
+      const finalResult = await pool.query(
+        "SELECT * FROM booking WHERE id = $1",
+        [bookingId]
+        );
+
+     const bookingData=finalResult.rows[0];
+     return bookingData;
   }
 
 
@@ -137,7 +157,12 @@ class BookingUtils {
       [id]
     );
 
-    return update.rows[0];
+      const bookingData = update.rows[0];
+      if (bookingData.email) {
+         sendEmail(bookingData.email, bookingData.booking_code,"CONFIRM");
+      }
+      return bookingData;
+
   }
 
 
@@ -214,13 +239,17 @@ class BookingUtils {
     }
 
     const update = await pool.query(
-      "UPDATE booking SET status='COMPLETED' WHERE id=$1 RETURNING *",
-      [id]
-    );
+        "UPDATE booking SET status='COMPLETED' WHERE id=$1 RETURNING *",
+        [id]
+       );
+    const bookingData = update.rows[0];
 
-    return update.rows[0];
+// send thank you email
+     if (bookingData.email) {
+       sendEmail(bookingData.email, bookingData.booking_code,"COMPLETE");
+      }
+     return bookingData;
   }
-
 }
 
 module.exports = BookingUtils;

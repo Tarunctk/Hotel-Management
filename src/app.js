@@ -8,7 +8,7 @@ const pricingRoute = require('./routes/pricingRoute')
 const bookingRoutes = require('./routes/bookingRoute')
 const validationMiddleware = require('./middlewares/validationMiddleware')
 const app = express()
-
+require("dotenv").config();
 app.use(express.json())
 app.use(cors())
 

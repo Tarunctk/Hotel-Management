@@ -1,5 +1,5 @@
-//const API = "https://hotel-management-e3zu.onrender.com";
-const API="http://localhost:3000"
+const API = "https://hotel-management-e3zu.onrender.com";
+//const API="http://localhost:3000"
 /* ---------------- GLOBAL ---------------- */
 
 let calculatedPrice = null

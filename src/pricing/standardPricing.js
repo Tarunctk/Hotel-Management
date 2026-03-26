@@ -1,5 +1,5 @@
 class StandardPricing {
-  calculatePrice(basePrice) {
+  calculatePrice(basePrice,date){
     return basePrice;
   }
 }

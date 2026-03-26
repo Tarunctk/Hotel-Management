@@ -1,11 +1,12 @@
 const nodemailer = require("nodemailer");
 
+// Create transporter
 const transporter = nodemailer.createTransport({
   host: "smtp-relay.brevo.com",
   port: 587,
   auth: {
-    user: process.env.USER,
-    pass: process.env.PASS
+    user: process.env.BREVO_USER,
+    pass: process.env.BREVO_PASS
   }
 });
 
@@ -30,17 +31,15 @@ const sendEmail = async (to, bookingCode, type) => {
       `;
     }
 
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+    // Send email
+    const info = await transporter.sendMail({
+      from: `"Hotel Management" <${process.env.EMAIL_FROM}>`,
       to: to,
       subject: subject,
       html: content
     });
-
-    console.log("Email sent successfully");
-
   } catch (err) {
-    console.error("Email error:", err);
+    console.error(" Email error:", err);
   }
 };
 

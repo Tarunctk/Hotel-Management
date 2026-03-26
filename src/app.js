@@ -1,3 +1,4 @@
+require("dotenv").config({ path: "../.env" });
 const express = require('express')
 const pool = require("./db/db")
 const cors = require('cors')
@@ -8,10 +9,8 @@ const pricingRoute = require('./routes/pricingRoute')
 const bookingRoutes = require('./routes/bookingRoute')
 const validationMiddleware = require('./middlewares/validationMiddleware')
 const app = express()
-require("dotenv").config();
 app.use(express.json())
 app.use(cors())
-
 app.use(validationMiddleware)
 
 app.use("/",hotelRoutes)

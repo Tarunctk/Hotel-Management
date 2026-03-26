@@ -1,5 +1,5 @@
 class WeekendPricing {
-  calculatePrice(basePrice) {
+  calculatePrice(basePrice,date) {
     return basePrice * 1.5;
   }
 }

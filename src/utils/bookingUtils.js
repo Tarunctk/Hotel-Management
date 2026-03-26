@@ -102,7 +102,7 @@ class BookingUtils {
       }
 
       const strategyObj = PricingStrategyFactory.getStrategy(strategy);
-      totalCost += strategyObj.calculatePrice(basePrice);
+      totalCost += strategyObj.calculatePrice(basePrice,currentDate);
 
       currentDate.setDate(currentDate.getDate() + 1);
     }

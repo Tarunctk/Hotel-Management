@@ -15,7 +15,7 @@ const validationMiddleware = require('./middlewares/validationMiddleware')
 const app = express()
 app.use(express.json())
 app.use(cors({
-  origin:"https://hotel-management-e3zu.onrender.com",
+  origin:"https://hotel-management-three-hazel.vercel.app",
   credentials: true
 }));
 app.use(validationMiddleware)

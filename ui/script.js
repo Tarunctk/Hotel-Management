@@ -1,5 +1,5 @@
 const API = "https://hotel-management-e3zu.onrender.com";
-//const API="http://localhost:3000"
+//const API = "http://localhost:3000";
 /* ---------------- GLOBAL ---------------- */
 
 let calculatedPrice = null
@@ -22,6 +22,83 @@ let hotelSearch = "";
 let roomTypeSearch = "";
 let roomSearch = "";
 let bookingSearch = "";
+
+
+
+/* ---------------- AUTH ---------------- */
+
+async function signup(){
+  console.log("signup called")
+
+  const name = document.getElementById("signupName").value
+  const email = document.getElementById("signupEmail").value
+  const password = document.getElementById("signupPassword").value
+
+  if(!name || !email || !password){
+    alert("Please fill all fields")
+    return
+  }
+
+  try {
+    const res = await fetch(`${API}/auth/signup`, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      credentials: "include",
+      body: JSON.stringify({ name, email, password })
+    })
+
+    const data = await res.json()
+
+    if(!res.ok){
+      alert(data.message || "Signup failed")
+      return
+    }
+
+    alert("Signup successful")
+
+    document.getElementById("signupName").value = "";
+    document.getElementById("signupEmail").value = "";
+    document.getElementById("signupPassword").value = "";
+
+  } catch(err){
+    alert("Server error")
+  }
+}
+
+
+async function login(){
+
+  console.log("login called")
+
+  const email = document.getElementById("loginEmail").value
+  const password = document.getElementById("loginPassword").value
+
+  try {
+
+    const res = await fetch(`${API}/auth/login`, {  // ✅ FIXED
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      credentials: "include",
+      body: JSON.stringify({ email, password })
+    })
+
+    const data = await res.json()
+
+    if(res.ok){
+      alert("Login successful")
+
+      document.getElementById("loginEmail").value = "";
+      document.getElementById("loginPassword").value = "";
+
+      loadBookings() // keep your flow
+    } else {
+      alert(data.message || "Login failed")
+    }
+
+  } catch(err){
+    alert("Server error")
+  }
+}
 
 
 /* ---------------- HOTEL ---------------- */
@@ -385,22 +462,36 @@ function prevBooking(){
 /* ---------------- BOOKING ACTIONS ---------------- */
 
 async function confirmBooking(id){
-  await fetch(`${API}/booking/${id}/confirm`, { method: "PATCH" })
+  await fetch(`${API}/booking/${id}/confirm`, { 
+    method: "PATCH" ,
+    credentials: "include"
+  })
   loadBookings()
 }
 
 async function checkInBooking(id){
-  await fetch(`${API}/booking/${id}/checkin`, { method: "PATCH" })
+  await fetch(`${API}/booking/${id}/checkin`, {
+     method: "PATCH",
+     credentials: "include"
+  })
   loadBookings()
 }
 
 async function checkOutBooking(id){
-  await fetch(`${API}/booking/${id}/checkout`, { method: "PATCH" })
+  await fetch(`${API}/booking/${id}/checkout`, { 
+    method: "PATCH",
+    credentials: "include" 
+
+  })
   loadBookings()
 }
 
 async function completeBooking(id){
-  await fetch(`${API}/booking/${id}/complete`, { method: "PATCH" })
+  await fetch(`${API}/booking/${id}/complete`, { 
+    method: "PATCH",
+    credentials: "include" 
+
+  })
   loadBookings()
 }
 
@@ -471,6 +562,16 @@ async function createBooking(){
     return
   }
 
+  // ✅ ADD THIS (auth check)
+  const check = await fetch(`${API}/auth/check`, {
+    credentials: "include"
+  })
+
+  if(!check.ok){
+    alert("Please login first")
+    return
+  }
+
   const guestName = document.getElementById("guestName").value
   const roomTypeId = document.getElementById("bookingRoomTypeId").value
   const checkIn = document.getElementById("checkInDate").value
@@ -482,6 +583,7 @@ async function createBooking(){
     const res = await fetch(`${API}/booking`, {
       method:"POST",
       headers:{"Content-Type":"application/json"},
+      credentials: "include",
       body:JSON.stringify({
         guestName: guestName,
         roomTypeId: Number(roomTypeId),
@@ -493,19 +595,18 @@ async function createBooking(){
 
     const data = await res.json()
 
-    //HANDLE ERROR FROM BACKEND
     if(!res.ok){
       alert(data.error || "Booking failed")
       return
     }
 
-    //SUCCESS
     alert("Booking Created Successfully")
 
     document.getElementById("guestName").value=""
     document.getElementById("bookingRoomTypeId").value=""
     document.getElementById("checkInDate").value=""
     document.getElementById("checkOutDate").value=""
+    document.getElementById("email").value = ""
     document.getElementById("bookingPriceResult").innerText=""
 
     document.getElementById("createBookingBtn").disabled=true

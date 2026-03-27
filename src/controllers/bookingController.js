@@ -5,6 +5,13 @@ const pool = require("../db/db");
 //Create Booking Initialization
 exports.createBooking = async (req,res)=>{
   try{
+    const userId = req.user.id;
+    const userResult=await pool.query(
+      "select * from users where id=$1",
+      [userId]
+    );
+    const user=userResult.rows[0]
+    
     const {guestName, roomTypeId, checkInDate, checkOutDate,email} = req.body;
     const booking = await BookingUtils.initializeBooking(
       guestName,

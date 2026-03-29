@@ -9,7 +9,7 @@ const roomTypeRoutes=require('./routes/roomTypeRoute')
 const pricingRoute = require('./routes/pricingRoute')
 const bookingRoutes = require('./routes/bookingRoute')
 const authRoutes = require("./routes/authRoutes");
-
+const redis = require("./db/redisClient");
 
 const validationMiddleware = require('./middlewares/validationMiddleware')
 const app = express()
@@ -28,6 +28,14 @@ app.use("/",roomTypeRoutes)
 app.use("/", pricingRoute)
 app.use("/booking", bookingRoutes);
 app.use("/auth", authRoutes);
+
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "OK",
+    message: "Server is running",
+    time: new Date()
+  });
+});
 
 const port = 3000
 app.listen(port, ()=>{

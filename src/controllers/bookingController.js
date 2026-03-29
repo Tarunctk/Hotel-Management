@@ -1,18 +1,158 @@
+// const BookingUtils = require("../utils/bookingUtils");
+// const pool = require("../db/db");
+
+
+// //Create Booking Initialization
+// exports.createBooking = async (req,res)=>{
+//   try{
+//     const userId = req.user.id;
+//     const userResult=await pool.query(
+//       "select * from users where id=$1",
+//       [userId]
+//     );
+//     const user=userResult.rows[0]
+    
+//     const {guestName, roomTypeId, checkInDate, checkOutDate,email} = req.body;
+//     const booking = await BookingUtils.initializeBooking(
+//       guestName,
+//       roomTypeId,
+//       checkInDate,
+//       checkOutDate,
+//       email
+//     );
+//     res.json(booking);
+//   }catch(err){
+//     console.error(err);
+//     res.status(500).json({error:err.message});
+//   }
+// };
+
+// //Confirm Booking
+// exports.confirmBooking = async (req,res)=>{
+//   try{
+//     const {id} = req.params;
+//     const booking = await BookingUtils.confirmBooking(id);
+//     res.json(booking);
+//   }
+//   catch(err){
+//     console.error(err);
+//     res.status(500).json({error:err.message});
+//   }
+// };
+
+
+// // Check In
+// exports.checkInBooking = async (req,res)=>{
+//   try{
+//     const {id} = req.params;
+//     const booking = await BookingUtils.checkInBooking(id);
+//     res.json(booking);
+//   }
+//   catch(err){
+//     console.error(err);
+//     res.status(500).json({error:err.message});
+//   }
+// };
+
+
+// //Check Out
+// exports.checkOutBooking = async (req,res)=>{
+//   try{
+//     const {id} = req.params;
+//     const booking = await BookingUtils.checkOutBooking(id);
+//     res.json(booking);
+//   }
+//   catch(err){
+//     console.error(err);
+//     res.status(500).json({error:err.message});
+//   }
+// };
+
+
+// //Complete Booking
+// exports.completeBooking = async (req,res)=>{
+//   try{
+//     const {id} = req.params;
+//     const booking = await BookingUtils.completeBooking(id);
+//     res.json(booking);
+//   }
+//   catch(err){
+//     console.error(err);
+//     res.status(500).json({error:err.message});
+//   }
+// };
+
+
+// //List Bookings
+// exports.getBookings = async (req, res) => {
+//   try {
+
+//     const page = parseInt(req.query.page) || 1;
+//     const limit = parseInt(req.query.limit) || 5;
+//     const search = req.query.search || "";
+
+//     const offset = (page - 1) * limit;
+
+//     const searchQuery = `%${search}%`;
+
+//     const result = await pool.query(
+//       `SELECT b.*, r.name AS room_type_name
+//        FROM booking b
+//        LEFT JOIN room_type r ON b.room_type_id = r.id
+//        WHERE
+//        b.guest_name ILIKE $1
+//        OR r.name ILIKE $1
+//        OR b.status ILIKE $1
+//        OR CAST(b.id AS TEXT) ILIKE $1
+//        ORDER BY b.id
+//        LIMIT $2 OFFSET $3`,
+//       [searchQuery, limit, offset]
+//     );
+
+//     const count = await pool.query(
+//       `SELECT COUNT(*)
+//        FROM booking b
+//        LEFT JOIN room_type r ON b.room_type_id = r.id
+//        WHERE
+//        b.guest_name ILIKE $1
+//        OR r.name ILIKE $1
+//        OR b.status ILIKE $1
+//        OR CAST(b.id AS TEXT) ILIKE $1`,
+//       [searchQuery]
+//     );
+
+//     const totalPages = Math.ceil(count.rows[0].count / limit);
+
+//     res.json({
+//       data: result.rows,
+//       totalPages
+//     });
+
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: "Server error" });
+//   }
+// };
+
 const BookingUtils = require("../utils/bookingUtils");
 const pool = require("../db/db");
+const redis = require("../db/redisClient");
 
 
-//Create Booking Initialization
+// Create Booking Initialization
 exports.createBooking = async (req,res)=>{
   try{
     const userId = req.user.id;
-    const userResult=await pool.query(
+
+    const userResult = await pool.query(
       "select * from users where id=$1",
       [userId]
     );
-    const user=userResult.rows[0]
-    
-    const {guestName, roomTypeId, checkInDate, checkOutDate,email} = req.body;
+
+    const user = userResult.rows[0];
+
+    const {guestName, roomTypeId, checkInDate, checkOutDate, email} = req.body;
+
     const booking = await BookingUtils.initializeBooking(
       guestName,
       roomTypeId,
@@ -20,21 +160,42 @@ exports.createBooking = async (req,res)=>{
       checkOutDate,
       email
     );
+
+    // 🔥 Clear cache
+    const keys = await redis.keys("bookings:*")
+    if (keys.length > 0) {
+      await redis.del(keys)
+    }
+
+    console.log("Cache cleared")
+
     res.json(booking);
+
   }catch(err){
     console.error(err);
     res.status(500).json({error:err.message});
   }
 };
 
-//Confirm Booking
+
+// Confirm Booking
 exports.confirmBooking = async (req,res)=>{
   try{
     const {id} = req.params;
+
     const booking = await BookingUtils.confirmBooking(id);
+
+    // 🔥 Clear cache
+    const keys = await redis.keys("bookings:*")
+    if (keys.length > 0) {
+      await redis.del(keys)
+    }
+
+    console.log("Cache cleared")
+
     res.json(booking);
-  }
-  catch(err){
+
+  }catch(err){
     console.error(err);
     res.status(500).json({error:err.message});
   }
@@ -45,45 +206,75 @@ exports.confirmBooking = async (req,res)=>{
 exports.checkInBooking = async (req,res)=>{
   try{
     const {id} = req.params;
+
     const booking = await BookingUtils.checkInBooking(id);
+
+    // 🔥 Clear cache
+    const keys = await redis.keys("bookings:*")
+    if (keys.length > 0) {
+      await redis.del(keys)
+    }
+
+    console.log("Cache cleared")
+
     res.json(booking);
-  }
-  catch(err){
+
+  }catch(err){
     console.error(err);
     res.status(500).json({error:err.message});
   }
 };
 
 
-//Check Out
+// Check Out
 exports.checkOutBooking = async (req,res)=>{
   try{
     const {id} = req.params;
+
     const booking = await BookingUtils.checkOutBooking(id);
+
+    // 🔥 Clear cache
+    const keys = await redis.keys("bookings:*")
+    if (keys.length > 0) {
+      await redis.del(keys)
+    }
+
+    console.log("Cache cleared")
+
     res.json(booking);
-  }
-  catch(err){
+
+  }catch(err){
     console.error(err);
     res.status(500).json({error:err.message});
   }
 };
 
 
-//Complete Booking
+// Complete Booking
 exports.completeBooking = async (req,res)=>{
   try{
     const {id} = req.params;
+
     const booking = await BookingUtils.completeBooking(id);
+
+    // 🔥 Clear cache
+    const keys = await redis.keys("bookings:*")
+    if (keys.length > 0) {
+      await redis.del(keys)
+    }
+
+    console.log("Cache cleared")
+
     res.json(booking);
-  }
-  catch(err){
+
+  }catch(err){
     console.error(err);
     res.status(500).json({error:err.message});
   }
 };
 
 
-//List Bookings
+// List Bookings (GET)
 exports.getBookings = async (req, res) => {
   try {
 
@@ -92,6 +283,16 @@ exports.getBookings = async (req, res) => {
     const search = req.query.search || "";
 
     const offset = (page - 1) * limit;
+
+    const cacheKey = `bookings:${page}:${limit}:${search}`
+
+    // 🔹 Check Redis
+    const cachedData = await redis.get(cacheKey)
+
+    if (cachedData) {
+      console.log("Serving from Redis")
+      return res.json(JSON.parse(cachedData))
+    }
 
     const searchQuery = `%${search}%`;
 
@@ -123,10 +324,19 @@ exports.getBookings = async (req, res) => {
 
     const totalPages = Math.ceil(count.rows[0].count / limit);
 
-    res.json({
+    const responseData = {
       data: result.rows,
       totalPages
+    };
+
+    // 🔹 Store in Redis
+    await redis.set(cacheKey, JSON.stringify(responseData), {
+      EX: 60
     });
+
+    console.log("Stored in Redis")
+
+    res.json(responseData);
 
   } catch (err) {
     console.error(err);

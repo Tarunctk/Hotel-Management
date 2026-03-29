@@ -1,6 +1,31 @@
 const pool = require("../db/db");
 const PricingStrategyFactory = require("../pricing/pricingStrategy");
 const sendEmail = require("./email");
+const wait = (ms) => new Promise(res => setTimeout(res, ms));
+
+async function sendEmailWithRetry(email, code, type) {
+  let delay = 2000; // 2 sec
+
+  for (let i = 0; i < 3; i++) {
+    try {
+      await sendEmail(email, code, type);
+      return true; // success → exit
+    } catch (err) {
+      console.log(`Attempt ${i + 1} failed`);
+
+      if (i === 2) {
+        console.log("All attempts failed ❌");
+        return false;
+      }
+
+      console.log(`Retrying in ${delay / 1000} seconds...`);
+      await wait(delay);
+
+      delay *= 2; // 2 → 4 → 8
+    }
+  }
+}
+
 
 const generateBookingCode = (id) => {
   const year = new Date().getFullYear();
@@ -157,12 +182,20 @@ class BookingUtils {
       [id]
     );
 
-      const bookingData = update.rows[0];
-      if (bookingData.email) {
-         sendEmail(bookingData.email, bookingData.booking_code,"CONFIRM");
+    const bookingData = update.rows[0];
+    let emailStatus = null;
+    if (bookingData.email) {
+        const isEmailSent= await sendEmailWithRetry(
+        bookingData.email,
+        bookingData.booking_code,
+        "CONFIRM"
+      );
+      emailStatus = isEmailSent ? "SUCCESS" : "FAILED";
+     }
+      return {
+        booking:bookingData,
+        emailStatus
       }
-      return bookingData;
-
   }
 
 
@@ -245,11 +278,19 @@ class BookingUtils {
     const bookingData = update.rows[0];
 
 // send thank you email
-     if (bookingData.email) {
-       sendEmail(bookingData.email, bookingData.booking_code,"COMPLETE");
-      }
-     return bookingData;
+       let emailStatus = null;
+      if (bookingData.email) {
+          const isEmailSent=  await sendEmailWithRetry(
+               bookingData.email,
+               bookingData.booking_code,
+              "COMPLETE"
+        );
+        emailStatus=isEmailSent ? "SUCCESS" : "FAILED";
+     }
+    return {
+    booking:bookingData,
+    emailStatus
+    }
   }
 }
-
 module.exports = BookingUtils;

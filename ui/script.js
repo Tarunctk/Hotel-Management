@@ -462,13 +462,24 @@ function prevBooking(){
 /* ---------------- BOOKING ACTIONS ---------------- */
 
 async function confirmBooking(id){
-  await fetch(`${API}/booking/${id}/confirm`, { 
-    method: "PATCH" ,
+  const res = await fetch(`${API}/booking/${id}/confirm`, { 
+    method: "PATCH",
     credentials: "include"
-  })
-  loadBookings()
-}
+  });
 
+  const data = await res.json();
+  console.log(data);
+
+  if (data.emailStatus === "SUCCESS") {
+    alert("Booking confirmed & email sent ✅");
+  } else if (data.emailStatus === "FAILED") {
+    alert("Booking confirmed but email failed ❌");
+  }else {
+    alert("Booking confirmed (no email available)");
+  }
+
+  loadBookings();
+}
 async function checkInBooking(id){
   await fetch(`${API}/booking/${id}/checkin`, {
      method: "PATCH",
@@ -487,12 +498,23 @@ async function checkOutBooking(id){
 }
 
 async function completeBooking(id){
-  await fetch(`${API}/booking/${id}/complete`, { 
+  const res = await fetch(`${API}/booking/${id}/complete`, { 
     method: "PATCH",
     credentials: "include" 
+  });
 
-  })
-  loadBookings()
+  const data = await res.json();
+  console.log(data);
+
+  if (data.emailStatus === "SUCCESS") {
+    alert("Booking completed & email sent ✅");
+  } else if (data.emailStatus === "FAILED") {
+    alert("Booking completed but email failed ❌");
+  }else {
+    alert("Booking confirmed (no email available)");
+  }
+
+  loadBookings();
 }
 
 

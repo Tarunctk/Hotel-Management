@@ -65,7 +65,12 @@ exports.login = async (req, res) => {
         sameSite: "None",
        });
 
-    res.json({ message: "Login successful" });
+    res.json({
+       message: "Login successful",
+       id: user.id,
+       email: user.email,
+       role: user.role
+    });
 
   } catch (err) {
     console.error(err);

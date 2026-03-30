@@ -1,5 +1,5 @@
-const API = "https://hotel-management-e3zu.onrender.com";
-//const API = "http://localhost:3000";
+//const API = "https://hotel-management-e3zu.onrender.com";
+const API = "http://localhost:3000";
 /* ---------------- GLOBAL ---------------- */
 
 let calculatedPrice = null
@@ -23,8 +23,14 @@ let roomTypeSearch = "";
 let roomSearch = "";
 let bookingSearch = "";
 
+const role = localStorage.getItem("role");
+console.log("ROLE VALUE:", role);
+console.log("PATH:", window.location.pathname);
 
-
+if (window.location.pathname.includes("admin.html") && role !== "ADMIN") {
+  alert("Access denied");
+  window.location.href = "user.html";
+}
 /* ---------------- AUTH ---------------- */
 
 async function signup(){
@@ -57,7 +63,7 @@ async function signup(){
     alert("Signup successful")
 
     document.getElementById("signupName").value = "";
-    document.getElementById("signupEmail").value = "";
+    document.getElementBysId("signupEmail").value = "";
     document.getElementById("signupPassword").value = "";
 
   } catch(err){
@@ -66,40 +72,55 @@ async function signup(){
 }
 
 
-async function login(){
+async function login() {
+  console.log("login called");
 
-  console.log("login called")
+  const email = document.getElementById("loginEmail").value;
+  const password = document.getElementById("loginPassword").value;
 
-  const email = document.getElementById("loginEmail").value
-  const password = document.getElementById("loginPassword").value
+  if (!email || !password) {
+    alert("Please enter both email and password");
+    return;
+  }
 
   try {
-
-    const res = await fetch(`${API}/auth/login`, {  // ✅ FIXED
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
+    const res = await fetch(`${API}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({ email, password })
-    })
+      body: JSON.stringify({ email, password }),
+    });
 
-    const data = await res.json()
+    console.log("Response status:", res.status);
+    const data = await res.json();
+    console.log(data);
 
-    if(res.ok){
-      alert("Login successful")
+    if (res.ok) {
+      alert("Login successful");
 
+      // store role
+      localStorage.setItem("role", data.role);
+
+      // redirect based on role
+      if (data.role === "ADMIN") {
+        window.location.href = "admin.html";
+      } else {
+        window.location.href = "user.html";
+      }
+
+      // clear login fields
       document.getElementById("loginEmail").value = "";
       document.getElementById("loginPassword").value = "";
 
-      loadBookings() // keep your flow
     } else {
-      alert(data.message || "Login failed")
+      alert(data.message || "Login failed");
     }
 
-  } catch(err){
-    alert("Server error")
+  } catch (err) {
+    console.error("Error:", err);
+    alert("Server error");
   }
 }
-
 
 /* ---------------- HOTEL ---------------- */
 
@@ -644,18 +665,53 @@ async function createBooking(){
 
 /* ---------------- INITIAL LOAD ---------------- */
 
+// window.onload = () => {
+
+// loadHotels()
+// loadRoomTypes()
+// loadRooms()
+// loadBookings()
+// loadRoomTypeDropdown()
+
+// document.getElementById("createBookingBtn").disabled = true
+
+// document.getElementById("bookingRoomTypeId").addEventListener("change", resetPrice)
+// document.getElementById("checkInDate").addEventListener("change", resetPrice)
+// document.getElementById("checkOutDate").addEventListener("change", resetPrice)
+
+// }
+
+function logout() {
+  // Remove stored role
+  localStorage.removeItem("role");
+
+  // Optional: show alert
+  alert("You have been logged out ✅");
+
+  // Redirect to login/signup page
+  window.location.href = "index.html";
+}
+
 window.onload = () => {
 
-loadHotels()
-loadRoomTypes()
-loadRooms()
-loadBookings()
-loadRoomTypeDropdown()
+  if (document.getElementById("hotelTable")) loadHotels()
+  if (document.getElementById("roomTypeTable")) loadRoomTypes()
+  if (document.getElementById("roomTable")) loadRooms()
+  if (document.getElementById("bookingTable")) loadBookings()
 
-document.getElementById("createBookingBtn").disabled = true
+  if (document.getElementById("bookingRoomTypeId")) {
+    loadRoomTypeDropdown()
 
-document.getElementById("bookingRoomTypeId").addEventListener("change", resetPrice)
-document.getElementById("checkInDate").addEventListener("change", resetPrice)
-document.getElementById("checkOutDate").addEventListener("change", resetPrice)
+    const btn = document.getElementById("createBookingBtn")
+    if (btn) btn.disabled = true
+
+    const roomType = document.getElementById("bookingRoomTypeId")
+    const checkIn = document.getElementById("checkInDate")
+    const checkOut = document.getElementById("checkOutDate")
+
+    if (roomType) roomType.addEventListener("change", resetPrice)
+    if (checkIn) checkIn.addEventListener("change", resetPrice)
+    if (checkOut) checkOut.addEventListener("change", resetPrice)
+  }
 
 }

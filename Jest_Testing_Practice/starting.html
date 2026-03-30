@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<title>Hotel Admin Panel</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<h1>Hotel Management Admin Panel</h1>
+
+<!-- AUTH SECTION -->
+<section>
+
+<h2>Signup</h2>
+<div class="form-row">
+  <input id="signupName" placeholder="Name">
+  <input id="signupEmail" placeholder="Email">
+  <input id="signupPassword" type="password" placeholder="Password">
+  <button onclick="signup()">Signup</button>
+</div>
+
+<h2>Login</h2>
+<div class="form-row">
+  <input id="loginEmail" placeholder="Email">
+  <input id="loginPassword" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+</div>
+
+</section>
+
+<!-- HOTEL -->
+<section>
+
+<h2>Create Hotel</h2>
+
+<div class="form-row">
+<input id="hotelName" placeholder="Hotel Name">
+<input id="hotelLocation" placeholder="Location">
+<button onclick="createHotel()">Create Hotel</button>
+</div>
+
+<h3>Hotel List</h3>
+
+<input id="hotelSearch" placeholder="Search hotel..." onkeyup="searchHotels()">
+
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Location</th>
+</tr>
+</thead>
+<tbody id="hotelTable"></tbody>
+</table>
+
+<div class="pagination">
+<button onclick="prevHotel()">Previous</button>
+<span id="hotelPageInfo"></span>
+<button onclick="nextHotel()">Next</button>
+</div>
+
+</section>
+
+<!-- ROOM TYPE -->
+<section>
+
+<h2>Create Room Type</h2>
+
+<div class="form-row">
+<input id="roomTypeName" placeholder="Type Name">
+<input id="roomPrice" type="number" placeholder="Price">
+<input id="maxOccupancy" type="number" placeholder="Max Occupancy">
+<input id="strategy" placeholder="Pricing Strategy">
+<button onclick="createRoomType()">Create Room Type</button>
+</div>
+
+<h3>Room Type List</h3>
+
+<input id="roomTypeSearch" placeholder="Search room type..." onkeyup="searchRoomTypes()">
+
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Price</th>
+<th>Max Occupancy</th>
+<th>Strategy</th>
+</tr>
+</thead>
+<tbody id="roomTypeTable"></tbody>
+</table>
+
+<div class="pagination">
+<button onclick="prevRoomType()">Previous</button>
+<span id="roomTypePageInfo"></span>
+<button onclick="nextRoomType()">Next</button>
+</div>
+
+</section>
+
+<!-- ROOM -->
+<section>
+
+<h2>Create Room</h2>
+
+<div class="form-row">
+<input id="roomNumber" type="number" placeholder="Room Number">
+<input id="floor" type="number" placeholder="Floor">
+<input id="roomHotelId" type="number" placeholder="Hotel ID">
+<input id="roomTypeId" type="number" placeholder="Room Type ID">
+<button onclick="createRoom()">Create Room</button>
+</div>
+
+<h3>Room List</h3>
+
+<input id="roomSearch" placeholder="Search room..." onkeyup="searchRooms()">
+
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Room Number</th>
+<th>Floor</th>
+<th>Hotel</th>
+<th>Room Type</th>
+</tr>
+</thead>
+<tbody id="roomTable"></tbody>
+</table>
+
+<div class="pagination">
+<button onclick="prevRoom()">Previous</button>
+<span id="roomPageInfo"></span>
+<button onclick="nextRoom()">Next</button>
+</div>
+
+</section>
+
+<!-- BOOKING -->
+<section>
+
+<h2>Create Booking</h2>
+
+<div class="form-row" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+
+  <input id="guestName" placeholder="Guest Name">
+
+  <select id="bookingRoomTypeId"></select>
+
+  <b><span style="font-size:14px;">Check-In</span></b>
+  <input id="checkInDate" type="date">
+
+  <b><span style="font-size:14px;">Check-Out</span></b>
+  <input id="checkOutDate" type="date">
+
+  <input type="email" id="email" placeholder="Enter email" required />
+
+  <button onclick="checkBookingPrice()">Check Price</button>
+
+  <button id="createBookingBtn" onclick="createBooking()" disabled>
+    Create Booking
+  </button>
+
+</div>
+
+<p id="bookingPriceResult"></p>
+
+<h3>Booking List</h3>
+
+<input id="bookingSearch" placeholder="Search booking..." onkeyup="searchBookings()">
+
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Guest</th>
+<th>Room Type</th>
+<th>Check In</th>
+<th>Check Out</th>
+<th>Total Cost</th>
+<th>Status</th>
+<th>Room ID</th>
+<th>Actions</th>
+</tr>
+</thead>
+
+<tbody id="bookingTable"></tbody>
+
+</table>
+
+<div class="pagination">
+<button onclick="prevBooking()">Previous</button>
+<span id="bookingPageInfo"></span>
+<button onclick="nextBooking()">Next</button>
+</div>
+
+</section>
+
+<script src="script.js"></script>
+
+</body>
+</html>

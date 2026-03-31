@@ -469,6 +469,30 @@ async function loadBookings() {
     `Page ${bookingPage} of ${totalBookingPages}`;
 }
 
+//loading guest bookings
+
+async function loadGuestBookings() {
+  const email = document.getElementById("email").value;
+
+  if (!email) return;
+
+  const res = await fetch(`${API}/booking/guest?email=${email}`);
+  const result = await res.json();
+
+  const table = document.getElementById("bookingTable");
+  table.innerHTML = "";
+
+  result.data.forEach(b => {
+    table.innerHTML += `
+      <tr>
+        <td>${b.id}</td>
+        <td>${b.status}</td>
+        <td>${b.total_cost}</td>
+      </tr>
+    `;
+  });
+}
+
 
 function searchBookings(){
 bookingSearch = document.getElementById("bookingSearch").value
@@ -659,7 +683,11 @@ async function createBooking(){
 
     calculatedPrice = null
 
-    loadBookings()
+    if (localStorage.getItem("role")) {
+       loadBookings(); // user/admin
+    } else {
+       loadGuestBookings(); // guest
+    }
 
   } catch(err){
     alert("Server error. Please try again.")

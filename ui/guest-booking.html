@@ -8,54 +8,105 @@
 
 <body>
 
-<header>
+<header style="display:flex; justify-content: space-between; align-items:center;">
   <h1>Guest Booking</h1>
+  <button onclick="goBack()">⬅ Back</button>
 </header>
 
+<!-- ✅ HOTEL LIST -->
 <section>
 
-  <div class="form-container">
-    <h2>Create Booking (Guest)</h2>
+<h3>Hotel List</h3>
 
-    <div class="form-row">
-      <input id="guestName" placeholder="Your Name">
-      <input id="email" placeholder="Your Email">
-    </div>
+<input id="hotelSearch" placeholder="Search hotel..." onkeyup="searchHotels()">
 
-    <div class="form-row">
-      <select id="bookingRoomTypeId"></select>
-    </div>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Location</th>
+</tr>
+</thead>
+<tbody id="hotelTable"></tbody>
+</table>
 
-    <div class="form-row">
-      <input id="checkInDate" type="date">
-      <input id="checkOutDate" type="date">
-    </div>
+<div class="pagination">
+<button onclick="prevHotel()">Previous</button>
+<span id="hotelPageInfo"></span>
+<button onclick="nextHotel()">Next</button>
+</div>
 
-    <div class="form-row">
-      <button onclick="checkBookingPrice()">Check Price</button>
-    </div>
+</section>
 
-    <p id="bookingPriceResult"></p>
+<!-- ✅ ROOM TYPE LIST -->
+<section>
 
-    <div class="form-row">
-      <button id="createBookingBtn" onclick="createBooking()">Create Booking</button>
-    </div>
+<h3>Room Type List</h3>
 
-  </div>
+<input id="roomTypeSearch" placeholder="Search room type..." onkeyup="searchRoomTypes()">
 
-  <!-- Back button -->
-  <div style="text-align:center; margin-top:20px;">
-    <button onclick="goBack()">⬅ Back</button>
-  </div>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Price</th>
+<th>Max Occupancy</th>
+<th>Strategy</th>
+</tr>
+</thead>
+<tbody id="roomTypeTable"></tbody>
+</table>
+
+<div class="pagination">
+<button onclick="prevRoomType()">Previous</button>
+<span id="roomTypePageInfo"></span>
+<button onclick="nextRoomType()">Next</button>
+</div>
+
+</section>
+
+<!-- ✅ BOOKING -->
+<section>
+
+<h2>Create Booking (Guest)</h2>
+
+<div class="form-row" style="display:flex; gap:10px; flex-wrap:wrap;">
+
+  <input id="guestName" placeholder="Your Name">
+
+  <input type="email" id="email" placeholder="Your Email">
+
+  <select id="bookingRoomTypeId"></select>
+
+  <input id="checkInDate" type="date">
+  <input id="checkOutDate" type="date">
+
+  <button onclick="checkBookingPrice()">Check Price</button>
+
+  <button id="createBookingBtn" onclick="createBooking()" disabled>
+    Create Booking
+  </button>
+
+</div>
+
+<p id="bookingPriceResult"></p>
 
 </section>
 
 <script src="script.js"></script>
 
 <script>
-  function goBack() {
-    window.location.href = "index.html";
-  }
+function goBack() {
+  window.location.href = "index.html";
+}
+
+// ✅ LOAD EVERYTHING (same as user panel)
+window.onload = function () {
+  if (typeof loadHotels === "function") loadHotels();
+  if (typeof loadRoomTypes === "function") loadRoomTypes();
+};
 </script>
 
 </body>

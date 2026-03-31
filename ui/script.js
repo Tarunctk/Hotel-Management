@@ -706,7 +706,7 @@ async function createBooking(){
     document.getElementById("bookingRoomTypeId").value=""
     document.getElementById("checkInDate").value=""
     document.getElementById("checkOutDate").value=""
-    document.getElementById("email").value = ""
+    //document.getElementById("email").value = ""
     document.getElementById("bookingPriceResult").innerText=""
 
     document.getElementById("createBookingBtn").disabled=true
@@ -763,6 +763,9 @@ window.onload = () => {
     } else {
       const emailInput = document.getElementById("email");
       if (emailInput) {
+            if (emailInput.value) {
+                loadGuestBookings();
+              }
          emailInput.addEventListener("change", loadGuestBookings);
         }
       }

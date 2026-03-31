@@ -13,13 +13,21 @@ const redis = require("./db/redisClient");
 
 const validationMiddleware = require('./middlewares/validationMiddleware')
 const app = express()
+
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "OK",
+    message: "Server is running",
+    time: new Date()
+  });
+});
+app.use(cookieParser())
 app.use(express.json())
 app.use(cors({
   origin:"https://hotel-management-three-hazel.vercel.app",
   credentials: true
 }));
 app.use(validationMiddleware)
-app.use(cookieParser())
 
 
 app.use("/",hotelRoutes)
@@ -29,13 +37,7 @@ app.use("/", pricingRoute)
 app.use("/booking", bookingRoutes);
 app.use("/auth", authRoutes);
 
-app.get("/health", (req, res) => {
-  res.status(200).json({
-    status: "OK",
-    message: "Server is running",
-    time: new Date()
-  });
-});
+
 
 const port = 3000
 app.listen(port, ()=>{

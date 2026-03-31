@@ -131,7 +131,7 @@ body.index-page .form-row input {
   font-size: 1rem;
 }
 
-body.index-page .form-row button {
+/* body.index-page .form-row button {
   padding: 10px;
   border: none;
   border-radius: 8px;
@@ -140,10 +140,27 @@ body.index-page .form-row button {
   font-size: 1rem;
   cursor: pointer;
   transition: background 0.3s;
+} */
+
+body.index-page .form-row button {
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background-color: #4CAF50;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;  /* ✅ changed */
 }
 
-body.index-page .form-row button:hover {
+/* body.index-page .form-row button:hover {
   background-color: #45a049;
+} */
+
+body.index-page .form-row button:hover {
+  background-color: #2d7a2d;
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
 }
 
 /* Responsive */

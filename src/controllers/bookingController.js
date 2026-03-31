@@ -224,6 +224,38 @@ exports.createGuestBooking = async (req, res) => {
 };
 
 
+//get the guest booking details
+
+
+exports.getGuestBookings = async (req, res) => {
+  try {
+
+    const { email } = req.query;
+
+    if (!email) {
+      return res.status(400).json({ error: "Email is required" });
+    }
+
+    const result = await pool.query(
+      `SELECT b.*, r.name AS room_type_name
+       FROM booking b
+       LEFT JOIN room_type r ON b.room_type_id = r.id
+       WHERE b.email = $1
+       ORDER BY b.id DESC`,
+      [email]
+    );
+
+    res.json({
+      data: result.rows
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
 // Confirm Booking
 exports.confirmBooking = async (req,res)=>{
   try{

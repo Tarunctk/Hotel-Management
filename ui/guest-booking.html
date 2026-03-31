@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Guest Booking</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+  <h1>Guest Booking</h1>
+</header>
+
+<section>
+
+  <div class="form-container">
+    <h2>Create Booking (Guest)</h2>
+
+    <div class="form-row">
+      <input id="guestName" placeholder="Your Name">
+      <input id="email" placeholder="Your Email">
+    </div>
+
+    <div class="form-row">
+      <select id="bookingRoomTypeId"></select>
+    </div>
+
+    <div class="form-row">
+      <input id="checkInDate" type="date">
+      <input id="checkOutDate" type="date">
+    </div>
+
+    <div class="form-row">
+      <button onclick="checkBookingPrice()">Check Price</button>
+    </div>
+
+    <p id="bookingPriceResult"></p>
+
+    <div class="form-row">
+      <button id="createBookingBtn" onclick="createBooking()">Create Booking</button>
+    </div>
+
+  </div>
+
+  <!-- Back button -->
+  <div style="text-align:center; margin-top:20px;">
+    <button onclick="goBack()">⬅ Back</button>
+  </div>
+
+</section>
+
+<script src="script.js"></script>
+
+<script>
+  function goBack() {
+    window.location.href = "index.html";
+  }
+</script>
+
+</body>
+</html>

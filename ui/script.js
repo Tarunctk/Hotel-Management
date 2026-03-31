@@ -666,6 +666,9 @@ async function createBooking(){
   }
 }
 
+function goToGuestBooking() {
+  window.location.href = "guest-booking.html";
+}
 /* ---------------- INITIAL LOAD ---------------- */
 
 // window.onload = () => {

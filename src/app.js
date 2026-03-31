@@ -21,6 +21,11 @@ app.get("/health", (req, res) => {
     time: new Date()
   });
 });
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Credentials", "true");
+  next();
+});
 //  origin:"https://hotel-management-three-hazel.vercel.app",
 
 app.use(cookieParser())

@@ -486,8 +486,26 @@ async function loadGuestBookings() {
     table.innerHTML += `
       <tr>
         <td>${b.id}</td>
-        <td>${b.status}</td>
+        <td>${b.guest_name}</td>
+        <td>${b.room_type_name}</td>
+        <td>${new Date(b.check_in_date).toLocaleDateString()}</td>
+        <td>${new Date(b.check_out_date).toLocaleDateString()}</td>
         <td>${b.total_cost}</td>
+        <td>${b.status}</td>
+        <td>${b.room_id ?? "-"}</td>
+        <td>
+          ${
+            b.status === "INITIALIZED"
+              ? `<button onclick="confirmBooking(${b.id})">Confirm</button>`
+              : b.status === "CONFIRMED"
+              ? `<button onclick="checkInBooking(${b.id})">Check-In</button>`
+              : b.status === "CHECKED_IN"
+              ? `<button onclick="checkOutBooking(${b.id})">Check-Out</button>`
+              : b.status === "CHECKED_OUT"
+              ? `<button onclick="completeBooking(${b.id})">Complete</button>`
+              : ""
+          }
+        </td>
       </tr>
     `;
   });

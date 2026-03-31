@@ -154,18 +154,29 @@ exports.createBooking = async (req,res)=>{
     const {guestName, roomTypeId, checkInDate, checkOutDate, email} = req.body;
 
     const booking = await BookingUtils.initializeBooking(
-      guestName,
-      roomTypeId,
-      checkInDate,
-      checkOutDate,
-      email
-    );
+           guestName,
+           roomTypeId,
+           checkInDate,
+           checkOutDate,
+           email
+       );
+
+    // ✅ Save user_id to booking
+    await pool.query(
+       "UPDATE booking SET user_id = $1 WHERE id = $2",
+       [userId, booking.id]
+     );
+
 
     // 🔥 Clear cache
-    const keys = await redis.keys("bookings:*")
-    if (keys.length > 0) {
-      await redis.del(keys)
-    }
+    // NEW CODE ✅ (clears BOTH admin and user cache)
+    const bookingKeys = await redis.keys("bookings:*")
+    const myBookingKeys = await redis.keys(`mybookings:${userId}:*`)
+
+    const allKeys = [...bookingKeys, ...myBookingKeys]
+    if (allKeys.length > 0) {
+         await redis.del(allKeys)
+     }
 
     console.log("Cache cleared")
 
@@ -186,10 +197,13 @@ exports.confirmBooking = async (req,res)=>{
     const booking = await BookingUtils.confirmBooking(id);
 
     // 🔥 Clear cache
-    const keys = await redis.keys("bookings:*")
-    if (keys.length > 0) {
-      await redis.del(keys)
-    }
+    // ✅ NEW — clears both admin and user cache
+     const keys = await redis.keys("bookings:*")
+     const myKeys = await redis.keys("mybookings:*")
+     const allKeys = [...keys, ...myKeys]
+     if (allKeys.length > 0) {
+        await redis.del(allKeys)
+      }
 
     console.log("Cache cleared")
 
@@ -210,10 +224,13 @@ exports.checkInBooking = async (req,res)=>{
     const booking = await BookingUtils.checkInBooking(id);
 
     // 🔥 Clear cache
+      // ✅ NEW — clears both admin and user cache
     const keys = await redis.keys("bookings:*")
-    if (keys.length > 0) {
-      await redis.del(keys)
-    }
+    const myKeys = await redis.keys("mybookings:*")
+    const allKeys = [...keys, ...myKeys]
+     if (allKeys.length > 0) {
+       await redis.del(allKeys)
+      }
 
     console.log("Cache cleared")
 
@@ -233,11 +250,13 @@ exports.checkOutBooking = async (req,res)=>{
 
     const booking = await BookingUtils.checkOutBooking(id);
 
-    // 🔥 Clear cache
-    const keys = await redis.keys("bookings:*")
-    if (keys.length > 0) {
-      await redis.del(keys)
-    }
+     // ✅ NEW — clears both admin and user cache
+     const keys = await redis.keys("bookings:*")
+     const myKeys = await redis.keys("mybookings:*")
+     const allKeys = [...keys, ...myKeys]
+     if (allKeys.length > 0) {
+      await redis.del(allKeys)
+     }
 
     console.log("Cache cleared")
 
@@ -258,10 +277,13 @@ exports.completeBooking = async (req,res)=>{
     const booking = await BookingUtils.completeBooking(id);
 
     // 🔥 Clear cache
+    // ✅ NEW — clears both admin and user cache
     const keys = await redis.keys("bookings:*")
-    if (keys.length > 0) {
-      await redis.del(keys)
-    }
+    const myKeys = await redis.keys("mybookings:*")
+    const allKeys = [...keys, ...myKeys]
+      if (allKeys.length > 0) {
+         await redis.del(allKeys)
+        }
 
     console.log("Cache cleared")
 
@@ -335,6 +357,60 @@ exports.getBookings = async (req, res) => {
     });
 
     console.log("Stored in Redis")
+
+    res.json(responseData);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+
+// Get My Bookings (logged-in user only)
+exports.getMyBookings = async (req, res) => {
+  try {
+    const userId = req.user.id; // comes from cookie via authMiddleware
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const offset = (page - 1) * limit;
+
+    const cacheKey = `mybookings:${userId}:${page}:${limit}`;
+
+    // 🔹 Check Redis
+    const cachedData = await redis.get(cacheKey);
+    if (cachedData) {
+      console.log("Serving my bookings from Redis");
+      return res.json(JSON.parse(cachedData));
+    }
+
+    const result = await pool.query(
+      `SELECT b.*, r.name AS room_type_name
+       FROM booking b
+       LEFT JOIN room_type r ON b.room_type_id = r.id
+       WHERE b.user_id = $1
+       ORDER BY b.id DESC
+       LIMIT $2 OFFSET $3`,
+      [userId, limit, offset]
+    );
+
+    const count = await pool.query(
+      `SELECT COUNT(*) FROM booking WHERE user_id = $1`,
+      [userId]
+    );
+
+    const totalPages = Math.ceil(count.rows[0].count / limit);
+
+    const responseData = {
+      data: result.rows,
+      totalPages
+    };
+
+    // 🔹 Store in Redis
+    await redis.set(cacheKey, JSON.stringify(responseData), { EX: 60 });
+
+    console.log("Stored my bookings in Redis");
 
     res.json(responseData);
 

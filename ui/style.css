@@ -80,21 +80,14 @@ gap:10px;
 }
 
 
-/* Reset defaults */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/* ------------------- INDEX.HTML SPECIFIC ------------------- */
+body.index-page {
+  background: linear-gradient(to right, #74ebd5, #ACB6E5);
+  min-height: 100vh;
   font-family: 'Arial', sans-serif;
 }
 
-body {
-  background: linear-gradient(to right, #74ebd5, #ACB6E5);
-  min-height: 100vh;
-}
-
-/* Header on top */
-header {
+body.index-page header {
   text-align: center;
   padding: 40px 20px 20px 20px;
   color: #fff;
@@ -103,8 +96,7 @@ header {
   text-shadow: 1px 1px 5px rgba(0,0,0,0.3);
 }
 
-/* Section containing both forms */
-section {
+body.index-page section {
   display: flex;
   justify-content: center;
   gap: 50px;
@@ -112,8 +104,7 @@ section {
   flex-wrap: wrap;
 }
 
-/* Each form box */
-.form-container {
+body.index-page .form-container {
   background: #fff;
   padding: 30px 20px;
   border-radius: 15px;
@@ -121,28 +112,26 @@ section {
   width: 350px;
 }
 
-/* Form title */
-h2 {
+body.index-page h2 {
   text-align: center;
   margin-bottom: 20px;
   color: #333;
 }
 
-/* Form inputs */
-.form-row {
+body.index-page .form-row {
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
 
-.form-row input {
+body.index-page .form-row input {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 1rem;
 }
 
-.form-row button {
+body.index-page .form-row button {
   padding: 10px;
   border: none;
   border-radius: 8px;
@@ -153,13 +142,13 @@ h2 {
   transition: background 0.3s;
 }
 
-.form-row button:hover {
+body.index-page .form-row button:hover {
   background-color: #45a049;
 }
 
 /* Responsive */
 @media screen and (max-width: 900px) {
-  section {
+  body.index-page section {
     flex-direction: column;
     align-items: center;
   }

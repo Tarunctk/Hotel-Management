@@ -1,5 +1,6 @@
 //const API = "https://hotel-management-e3zu.onrender.com";
-const API = "http://localhost:3000";
+//const API = "http://localhost:3000";
+const API = "/api";
 /* ---------------- GLOBAL ---------------- */
 
 let calculatedPrice = null
@@ -96,10 +97,11 @@ async function login() {
     console.log(data);
 
     if (res.ok) {
-      alert("Login successful");
 
       // store role
       localStorage.setItem("role", data.role);
+      localStorage.setItem("email", data.email); // store email
+      localStorage.setItem("name", data.name);
 
       // redirect based on role
       if (data.role === "ADMIN") {
@@ -411,52 +413,62 @@ async function loadRoomTypeDropdown(){
 
 /* ---------------- BOOKING ---------------- */
 
-async function loadBookings(){
+async function loadBookings() {
+  const role = localStorage.getItem("role");
 
-const res = await fetch(`${API}/booking?page=${bookingPage}&limit=${limit}&search=${bookingSearch}`)
-const result = await res.json()
+  const url = role === "ADMIN"
+    ? `${API}/booking?page=${bookingPage}&limit=${limit}&search=${bookingSearch}`
+    : `${API}/booking/my?page=${bookingPage}&limit=${limit}`;
 
-const bookings = result.data
-totalBookingPages = result.totalPages
+  const res = await fetch(url, {
+    credentials: "include"
+  });
 
-const table = document.getElementById("bookingTable")
-table.innerHTML=""
+  const result = await res.json();
+  const bookings = result.data || [];
+  totalBookingPages = result.totalPages || 1;
 
-bookings.forEach(b=>{
-table.innerHTML += `
-<tr>
-<td>${b.id}</td>
-<td>${b.guest_name}</td>
-<td>${b.room_type_name}</td>
-<td>${new Date(b.check_in_date).toLocaleDateString()}</td>
-<td>${new Date(b.check_out_date).toLocaleDateString()}</td>
-<td>${b.total_cost}</td>
-<td>${b.status}</td>
-<td>${b.room_id}</td>
+  const table = document.getElementById("bookingTable");
+  table.innerHTML = "";
 
-
-<td>
-  ${
-    b.status === "INITIALIZED"
-      ? `<button onclick="confirmBooking(${b.id})">Confirm</button>`
-      : b.status === "CONFIRMED"
-      ? `<button onclick="checkInBooking(${b.id})">Check-In</button>`
-      : b.status === "CHECKED_IN"
-      ? `<button onclick="checkOutBooking(${b.id})">Check-Out</button>`
-      : b.status === "CHECKED_OUT"
-      ? `<button onclick="completeBooking(${b.id})">Complete</button>`
-      : ""
+  if (bookings.length === 0) {
+    table.innerHTML = `<tr><td colspan="8" style="text-align:center;">No bookings yet</td></tr>`;
+    document.getElementById("bookingPageInfo").innerText = "";
+    return;
   }
-</td>
 
-</tr>
-`
-})
+  bookings.forEach(b => {
+    table.innerHTML += `
+      <tr>
+        <td>${b.id}</td>
+        <td>${b.guest_name}</td>
+        <td>${b.room_type_name}</td>
+        <td>${new Date(b.check_in_date).toLocaleDateString()}</td>
+        <td>${new Date(b.check_out_date).toLocaleDateString()}</td>
+        <td>${b.total_cost}</td>
+        <td>${b.status}</td>
+        <td>${b.room_id ?? "-"}</td>
+        <td>
+          ${
+            b.status === "INITIALIZED"
+              ? `<button onclick="confirmBooking(${b.id})">Confirm</button>`
+              : b.status === "CONFIRMED"
+              ? `<button onclick="checkInBooking(${b.id})">Check-In</button>`
+              : b.status === "CHECKED_IN"
+              ? `<button onclick="checkOutBooking(${b.id})">Check-Out</button>`
+              : b.status === "CHECKED_OUT"
+              ? `<button onclick="completeBooking(${b.id})">Complete</button>`
+              : ""
+          }
+        </td>
+      </tr>
+    `;
+  });
 
-document.getElementById("bookingPageInfo").innerText =
-`Page ${bookingPage} of ${totalBookingPages}`
-
+  document.getElementById("bookingPageInfo").innerText =
+    `Page ${bookingPage} of ${totalBookingPages}`;
 }
+
 
 function searchBookings(){
 bookingSearch = document.getElementById("bookingSearch").value
@@ -605,15 +617,6 @@ async function createBooking(){
     return
   }
 
-  // ✅ ADD THIS (auth check)
-  const check = await fetch(`${API}/auth/check`, {
-    credentials: "include"
-  })
-
-  if(!check.ok){
-    alert("Please login first")
-    return
-  }
 
   const guestName = document.getElementById("guestName").value
   const roomTypeId = document.getElementById("bookingRoomTypeId").value
@@ -701,6 +704,13 @@ window.onload = () => {
 
   if (document.getElementById("bookingRoomTypeId")) {
     loadRoomTypeDropdown()
+
+    //  autofill name and email from localStorage
+    const savedName = localStorage.getItem("name");
+    const savedEmail = localStorage.getItem("email");
+
+    if (savedName) document.getElementById("guestName").value = savedName;
+    if (savedEmail) document.getElementById("email").value = savedEmail;
 
     const btn = document.getElementById("createBookingBtn")
     if (btn) btn.disabled = true

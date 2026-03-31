@@ -25,9 +25,15 @@ app.get("/health", (req, res) => {
 
 app.use(cookieParser())
 app.use(express.json())
+// app.use(cors({
+//   origin: true,
+//   credentials: true
+// }));
 app.use(cors({
-  origin: true,
-  credentials: true
+  origin: "https://hotel-management-three-hazel.vercel.app",
+  credentials: true,
+  methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type"]
 }));
 app.use(validationMiddleware)
 

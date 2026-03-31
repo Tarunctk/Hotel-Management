@@ -755,7 +755,17 @@ window.onload = () => {
   if (document.getElementById("hotelTable")) loadHotels()
   if (document.getElementById("roomTypeTable")) loadRoomTypes()
   if (document.getElementById("roomTable")) loadRooms()
-  if (document.getElementById("bookingTable")) loadBookings()
+  //if (document.getElementById("bookingTable")) loadBookings() ---> before adding guest mode booking
+  if (document.getElementById("bookingTable")) {
+  if (localStorage.getItem("role")) {
+     loadBookings(); // user/admin
+    } else {
+      const emailInput = document.getElementById("email");
+      if (emailInput) {
+         emailInput.addEventListener("change", loadGuestBookings);
+        }
+      }
+    }
 
   if (document.getElementById("bookingRoomTypeId")) {
     loadRoomTypeDropdown()

@@ -189,6 +189,41 @@ exports.createBooking = async (req,res)=>{
 };
 
 
+//creating a guest booking
+
+exports.createGuestBooking = async (req, res) => {
+  try {
+
+    const { guestName, roomTypeId, checkInDate, checkOutDate, email } = req.body;
+
+    const booking = await BookingUtils.initializeBooking(
+      guestName,
+      roomTypeId,
+      checkInDate,
+      checkOutDate,
+      email
+    );
+
+    // ❗ NO user_id update (guest has no account)
+
+    // 🔥 Clear only general cache (not mybookings)
+    const bookingKeys = await redis.keys("bookings:*");
+
+    if (bookingKeys.length > 0) {
+      await redis.del(bookingKeys);
+    }
+
+    console.log("Guest booking cache cleared");
+
+    res.json(booking);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
 // Confirm Booking
 exports.confirmBooking = async (req,res)=>{
   try{

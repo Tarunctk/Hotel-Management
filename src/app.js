@@ -21,10 +21,12 @@ app.get("/health", (req, res) => {
     time: new Date()
   });
 });
+//  origin:"https://hotel-management-three-hazel.vercel.app",
+
 app.use(cookieParser())
 app.use(express.json())
 app.use(cors({
-  origin:"https://hotel-management-three-hazel.vercel.app",
+  origin: true,
   credentials: true
 }));
 app.use(validationMiddleware)

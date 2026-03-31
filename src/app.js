@@ -30,16 +30,11 @@ app.use((req, res, next) => {
 
 app.use(cookieParser())
 app.use(express.json())
-// app.use(cors({
-//   origin: true,
-//   credentials: true
-// }));
 app.use(cors({
-  origin: "https://hotel-management-three-hazel.vercel.app",
-  credentials: true,
-  methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type"]
+  origin:"https://hotel-management-three-hazel.vercel.app",
+  credentials: true
 }));
+
 app.use(validationMiddleware)
 
 

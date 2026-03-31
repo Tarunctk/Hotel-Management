@@ -7,6 +7,7 @@ const createBookingDto = require("../dtos/createBooking.dto");
 
 router.get("/", bookingController.getBookings);
 router.get("/my", authMiddleware, bookingController.getMyBookings); //new line
+router.get("/guest", bookingController.getGuestBookings);
 router.post("/", authMiddleware,createBookingDto, bookingController.createBooking);
 router.post("/guest", bookingController.createGuestBooking);
 router.patch("/:id/confirm", bookingController.confirmBooking);

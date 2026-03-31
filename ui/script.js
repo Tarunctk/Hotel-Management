@@ -668,18 +668,24 @@ async function createBooking(){
 
   try {
 
-    const res = await fetch(`${API}/booking`, {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      credentials: "include",
-      body:JSON.stringify({
-        guestName: guestName,
-        roomTypeId: Number(roomTypeId),
-        checkInDate: checkIn,
-        checkOutDate: checkOut,
-        email:email
-      })
-    })
+     const isLoggedIn = localStorage.getItem("role");
+
+       const url = isLoggedIn 
+             ? `${API}/booking` 
+             : `${API}/booking/guest`;
+
+      const res = await fetch(url, {
+           method: "POST",
+           headers: { "Content-Type": "application/json" },
+           credentials: isLoggedIn ? "include" : "omit",
+           body: JSON.stringify({
+           guestName: guestName,
+           roomTypeId: Number(roomTypeId),
+           checkInDate: checkIn,
+           checkOutDate: checkOut,
+           email: email
+         })
+       });
 
     const data = await res.json()
 

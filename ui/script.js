@@ -696,6 +696,12 @@ async function createBooking(){
 
     alert("Booking Created Successfully")
 
+    if (localStorage.getItem("role")) {
+       loadBookings(); // user/admin
+    } else {
+       loadGuestBookings(); // guest
+    }
+
     document.getElementById("guestName").value=""
     document.getElementById("bookingRoomTypeId").value=""
     document.getElementById("checkInDate").value=""
@@ -707,11 +713,6 @@ async function createBooking(){
 
     calculatedPrice = null
 
-    if (localStorage.getItem("role")) {
-       loadBookings(); // user/admin
-    } else {
-       loadGuestBookings(); // guest
-    }
 
   } catch(err){
     alert("Server error. Please try again.")

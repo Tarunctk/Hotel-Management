@@ -39,7 +39,7 @@ app.use(express.json())
 const corsOptions = {
   origin: "https://hotel-management-three-hazel.vercel.app",
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // ✅ ADD THIS
+  methods: ["GET", "POST", "PUT","PATCH","DELETE", "OPTIONS"], // ✅ ADD THIS
   allowedHeaders: ["Content-Type", "Authorization"]
 };
 

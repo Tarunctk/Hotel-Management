@@ -64,7 +64,7 @@ async function signup(){
     alert("Signup successful")
 
     document.getElementById("signupName").value = "";
-    document.getElementBysId("signupEmail").value = "";
+    document.getElementById("signupEmail").value = "";
     document.getElementById("signupPassword").value = "";
 
   } catch(err){

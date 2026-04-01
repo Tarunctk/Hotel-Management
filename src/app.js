@@ -13,6 +13,7 @@ const redis = require("./db/redisClient");
 
 const validationMiddleware = require('./middlewares/validationMiddleware')
 const app = express()
+app.set("trust proxy", 1);
 
 app.get("/health", (req, res) => {
   res.status(200).json({

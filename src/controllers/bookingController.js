@@ -154,6 +154,21 @@ exports.createBooking = async (req,res)=>{
 
     const {guestName, roomTypeId, checkInDate, checkOutDate, email} = req.body;
 
+    //✅ Date validation (backend - MUST)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const checkIn = new Date(checkInDate);
+    const checkOut = new Date(checkOutDate);
+
+    if (checkIn < today) {
+      return res.status(400).json({ error: "Check-in cannot be in the past" });
+     }
+
+    if (checkOut <= checkIn) {
+      return res.status(400).json({ error: "Check-out must be after check-in" });
+     }
+
     const booking = await BookingUtils.initializeBooking(
            guestName,
            roomTypeId,
@@ -196,6 +211,20 @@ exports.createGuestBooking = async (req, res) => {
   try {
 
     const { guestName, roomTypeId, checkInDate, checkOutDate, email } = req.body;
+    // ✅ Date validation (backend - MUST)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const checkIn = new Date(checkInDate);
+    const checkOut = new Date(checkOutDate);
+
+    if (checkIn < today) {
+       return res.status(400).json({ error: "Check-in cannot be in the past" });
+     }
+
+    if (checkOut <= checkIn) {
+       return res.status(400).json({ error: "Check-out must be after check-in" });
+     }
 
     const booking = await BookingUtils.initializeBooking(
       guestName,

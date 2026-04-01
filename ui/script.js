@@ -614,6 +614,18 @@ async function checkBookingPrice(){
   const checkIn = document.getElementById("checkInDate").value
   const checkOut = document.getElementById("checkOutDate").value
 
+  const today = new Date().toISOString().split("T")[0];
+
+    if (checkIn < today) {
+       alert("Check-in cannot be in the past");
+       return;
+      }
+
+    if (checkOut <= checkIn) {
+       alert("Check-out must be after check-in");
+       return;
+     }
+
   if(!roomTypeId || !checkIn || !checkOut){
     alert("Please select Room Type and dates")
     return
@@ -654,6 +666,7 @@ async function checkBookingPrice(){
 
 async function createBooking(){
 
+
   if(calculatedPrice === null){
     alert("Please calculate price first")
     return
@@ -665,6 +678,18 @@ async function createBooking(){
   const checkIn = document.getElementById("checkInDate").value
   const checkOut = document.getElementById("checkOutDate").value
   const email = document.getElementById("email").value
+
+  const today = new Date().toISOString().split("T")[0];
+
+   if (checkIn < today) {
+     alert("Check-in cannot be in the past");
+    return;
+   }
+
+   if (checkOut <= checkIn) {
+      alert("Check-out must be after check-in");
+      return;
+    }
 
   try {
 
@@ -752,6 +777,18 @@ function logout() {
 }
 
 window.onload = () => {
+
+
+  // ✅ Prevent past date selection
+   const today = new Date().toISOString().split("T")[0];
+
+   const checkInInput = document.getElementById("checkInDate");
+   const checkOutInput = document.getElementById("checkOutDate");
+
+   if (checkInInput && checkOutInput) {
+     checkInInput.min = today;
+     checkOutInput.min = today;
+   }
 
   if (document.getElementById("hotelTable")) loadHotels()
   if (document.getElementById("roomTypeTable")) loadRoomTypes()

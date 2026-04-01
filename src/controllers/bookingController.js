@@ -142,8 +142,8 @@ const redis = require("../db/redisClient");
 // Create Booking Initialization
 exports.createBooking = async (req,res)=>{
   try{
-    //const userId = req.user.id;
-      const userId = req.userId
+      const userId = req.user.id;
+    //const userId = req.userId
 
     const userResult = await pool.query(
       "select * from users where id=$1",

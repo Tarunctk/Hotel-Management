@@ -41,7 +41,7 @@ exports.calculatePrice = async (req, res) => {
       const month = currentDate.getMonth() + 1
 
       //weekend
-      if (day === 6 || day === 7) {
+      if (day === 5 || day === 6) {
         applicableStrategies.push("WEEKEND")
       }
 
